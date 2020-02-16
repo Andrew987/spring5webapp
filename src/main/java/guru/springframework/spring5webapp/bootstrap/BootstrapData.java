@@ -6,29 +6,24 @@ import guru.springframework.spring5webapp.model.Publisher;
 import guru.springframework.spring5webapp.repositories.AuthorRepository;
 import guru.springframework.spring5webapp.repositories.BookRepository;
 import guru.springframework.spring5webapp.repositories.PublisherRepository;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
+public class BootstrapData implements CommandLineRunner {
 
-    private AuthorRepository authorRepository;
-    private BookRepository bookRepository;
-    private PublisherRepository publisherRepository;
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+    private final PublisherRepository publisherRepository;
 
-    public DevBootstrap(AuthorRepository authorRepository, BookRepository bookRepository, PublisherRepository publisherRepository) {
+    public BootstrapData(AuthorRepository authorRepository, BookRepository bookRepository, PublisherRepository publisherRepository) {
         this.authorRepository = authorRepository;
         this.bookRepository = bookRepository;
         this.publisherRepository = publisherRepository;
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        initData();
-    }
-
-    private void initData() {
+    public void run(String... args) throws Exception {
         Publisher publisher = new Publisher("Harper Collins", "New York");
         publisherRepository.save(publisher);
 
@@ -45,8 +40,12 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         Author rod = new Author("Rod", "Johnson");
         Book noEJB = new Book("J2EE Development without EJB", "23444", publisher);
         rod.getBooks().add(noEJB);
+        noEJB.getAuthors().add(rod);
 
         authorRepository.save(rod);
         bookRepository.save(noEJB);
+
+
+        System.out.println("BOOKS: " + bookRepository.count());
     }
 }
